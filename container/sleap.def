@@ -1,0 +1,37 @@
+BootStrap: docker
+From: nvidia/cuda:12.9.1-cudnn-devel-ubuntu24.04
+
+%environment
+    . /venv/bin/activate
+
+%post
+
+    # Update package lists
+    apt-get update -y
+
+    # Install Python and required dependencies
+    apt-get install -y --no-install-recommends \
+       curl \
+       libegl1 \
+       libgl1 \
+       libglib2.0-0 \
+       libxext6 \
+       python3-pip \
+       python3-venv \
+       wget
+
+    # Clean up APT when done
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+    # venv for our install
+    python3 -m venv /venv
+    . /venv/bin/activate
+    pip3 install --upgrade \
+        setuptools
+    pip3 install \
+        sleap-nn[torch]==0.1.0 \
+           --index-url https://pypi.org/simple \
+           --extra-index-url https://download.pytorch.org/whl/cu128
+
+

@@ -1,0 +1,22 @@
+
+container_image = osdf:///osg-public/containers/sleap-0.1.0-v1.sif
+
+log = logs/inference_$(Cluster)_$(Process).log
+error = logs/inference_$(Cluster)_$(Process).err
+output = logs/inference_$(Cluster)_$(Process).out
+
+executable = /venv/bin/sleap-nn
+arguments = track --data_path val.pkg.slp --model_paths models/fly_single_instance/ -o predictions.slp
+
+transfer_executable = False
+transfer_input_files = config.yaml, val.pkg.slp, models
+
+request_gpus = 1
+request_cpus = 1
+request_memory = 4GB
+request_disk = 15GB
+
+gpus_minimum_capability = 8.0
+
+queue 1
+

@@ -1,0 +1,61 @@
+
+# === DATA ===
+data_config:
+  train_labels_path:
+    - train.pkg.slp       # Your training data
+  val_labels_path:
+    - val.pkg.slp         # Your validation data (optional)
+  validation_fraction: 0.1  # Use 10% for validation if no val file
+
+  # Preprocessing
+  preprocessing:
+    ensure_rgb: false
+    ensure_grayscale: false
+    crop_size: null
+    min_crop_size: 100
+    scale: 1.0            # Image scale (0.5 = half size, faster)
+
+  # Augmentation (helps generalization)
+  use_augmentations_train: true
+  augmentation_config:
+    geometric:
+      rotation_min: -15.0
+      rotation_max: 15.0
+      scale_min: 0.9
+      scale_max: 1.1
+      affine_p: 0.5       # 50% chance of augmentation
+
+# === MODEL ===
+model_config:
+  backbone_config:
+    unet:
+      filters: 32         # Model size (16=small, 32=medium, 64=large)
+      max_stride: 16      # Receptive field size
+      output_stride: 2    # Output resolution (lower = more precise)
+
+  head_configs:
+    single_instance:      # Change this for different model types
+      confmaps:
+        sigma: 5.0        # Gaussian spread for keypoints
+
+# === TRAINING ===
+trainer_config:
+  max_epochs: 100         # Training epochs
+
+  # Saving
+  save_ckpt: true
+  ckpt_dir: models
+  run_name: fly_single_instance
+
+  # Data loading
+  train_data_loader:
+    batch_size: 4         # Increase if you have more GPU memory
+
+  # Optimization
+  optimizer:
+    lr: 0.0001            # Learning rate
+
+  # Early stopping
+  early_stopping:
+    stop_training_on_plateau: true
+    patience: 10          # Stop if no improvement for 10 epochs

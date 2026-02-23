@@ -1,0 +1,23 @@
+
+container_image = osdf:///osg-public/containers/sleap-0.1.0-v1.sif
+
+log = logs/training_$(Cluster)_$(Process).log
+error = logs/training_$(Cluster)_$(Process).err
+output = logs/training_$(Cluster)_$(Process).out
+
+executable = /venv/bin/sleap-nn
+arguments = train --config config.yaml
+
+transfer_executable = False
+transfer_input_files = config.yaml, train.pkg.slp, val.pkg.slp
+transfer_output_files = models
+
+request_gpus = 1
+request_cpus = 4
+request_memory = 4GB
+request_disk = 15GB
+
+gpus_minimum_capability = 8.0
+
+queue 1
+
