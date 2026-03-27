@@ -23,6 +23,7 @@ The repository contains:
 | `config.yaml` | SLEAP-NN training configuration |
 | `train.pkg.slp` | Packaged training dataset (fruit fly frames + labels) |
 | `val.pkg.slp` | Packaged validation dataset |
+| `videos.csv` | List of videos to run inference on |
 | `training.sub` | HTCondor submit file for model training |
 | `inference.sub` | HTCondor submit file for pose prediction |
 | `models/` | Output directory for trained model checkpoints |
