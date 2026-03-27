@@ -1,8 +1,10 @@
 # SLEAP on the OSPool
 
-[SLEAP](https://sleap.ai/) (Social LEAP Estimates Animal Poses) is an open-source deep learning framework for multi-animal pose estimation. This tutorial demonstrates how to train a SLEAP model, run inference, and evaluate results on the [OSPool](https://osg-htc.org/services/open_science_pool.html) - a national-scale distributed computing resource - using the [sleap-nn](https://nn.sleap.ai/) backend.
+[SLEAP](https://sleap.ai/) (Social LEAP Estimates Animal Poses) is an open-source deep learning framework for multi-animal pose estimation. This tutorial demonstrates how to train a SLEAP model and run inference on the [OSPool](https://osg-htc.org/services/open_science_pool.html) - a national-scale distributed computing resource - using the [sleap-nn](https://nn.sleap.ai/) backend.
 
-The example dataset consists of fruit fly (*Drosophila melanogaster*) video frames and follows the [sleap-nn Getting Started tutorial](https://nn.sleap.ai/latest/getting-started/first-model/). Included are HTCondor submit files for training, inference, and evaluation.
+The example dataset consists of fruit fly (*Drosophila melanogaster*) video frames and follows the [sleap-nn Getting Started tutorial](https://nn.sleap.ai/latest/getting-started/first-model/) and the [fly32](https://docs.sleap.ai/latest/reference/datasets/#fly32) dataset. Credit: [Berman et al. (2014)](https://royalsocietypublishing.org/doi/10.1098/rsif.2014.0672), [Pereira et al. (2019)](https://www.nature.com/articles/s41592-018-0234-5), [Pereira et al. (2022)](https://www.nature.com/articles/s41592-022-01426-1), Talmo Pereira, Gordon Berman, Joshua Shaevitz
+
+Included are HTCondor submit files for training and inference.
 
 ## Getting Started
 
@@ -23,7 +25,6 @@ The repository contains:
 | `val.pkg.slp` | Packaged validation dataset |
 | `training.sub` | HTCondor submit file for model training |
 | `inference.sub` | HTCondor submit file for pose prediction |
-| `evaluate.sub` | HTCondor submit file for model evaluation |
 | `models/` | Output directory for trained model checkpoints |
 | `logs/` | HTCondor job logs |
 | `container/sleap.def` | Apptainer definition file to build a custom container |
@@ -52,7 +53,6 @@ The typical workflow is:
 
 1. **Train** a model on labeled data
 2. **Infer** poses on new data using the trained model
-3. **Evaluate** model performance
 
 ### 1. Training
 
@@ -98,21 +98,34 @@ These model outputs will be used in the next step, inference.
 
 ### 2. Inference
 
-Once training is complete, submit the inference job to generate pose predictions on the validation dataset:
+Once training is complete, we can use the model for inference. The data we are using for the tutorial comes
+from the `fly32` data set mentioned above. We have 10 input vidoes, and they are listed in the `videos.csv`:
+
+<pre class="term"><code>$ cat videos.csv</code></pre>
+
+```
+100512_154639.mp4
+100812_112511.mp4
+100812_123754.mp4
+100812_134137.mp4
+100812_144551.mp4
+100912_134750.mp4
+100912_150055.mp4
+101012_123835.mp4
+101012_134451.mp4
+101012_145309.mp4
+```
+
+The `inference.sub` uses the `queue ... from ...` to loop over those files and create one job per video. Also note
+that the vidoes are staged from [OSDF](https://portal.osg-htc.org/documentation/htc_workloads/managing_data/osdf/).
+If you want to use your own data in these jobs, please place it on OSDF under `/ospool/apNN/data/USERNAME/` and
+update the OSDF URL in `inference.sub`.
+
+Now submit the inference jobs:
 
 <pre class="term"><code>$ condor_submit inference.sub</code></pre>
 
-This runs `sleap-nn track` against `val.pkg.slp` using the trained model outputs from the previous step and the same config file as before (`config.yaml`). The job produces an output dataset of predictions called `predictions.slp`. 
-
-### 3. Evaluate
-
-The final step compares the prediction dataset from step 2 (`predictions.slp`) with the original dataset (`val.pkg.slp`). 
-
-Submit the evaluation job to measure model accuracy:
-
-<pre class="term"><code>$ condor_submit evaluate.sub</code></pre>
-
-This job should produce an output file called `metrics.npz`. See the [tutorial](https://nn.sleap.ai/latest/getting-started/first-model/#understanding-metrics) for details on understanding the metrics.
+This runs `sleap-nn track` against each video using the trained model outputs from the previous step and the same config file as before (`config.yaml`). The job produces an output dataset of predictions named `{image}.predictions.slp`. 
 
 ## Customizing this tutorial for your own work
 

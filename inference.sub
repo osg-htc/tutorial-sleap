@@ -1,22 +1,21 @@
 
-container_image = osdf:///osg-public/containers/sleap-0.1.0-v1.sif
+container_image = osdf:///osg-public/containers/sleap-0.1.3-v1.sif
 
 log = logs/inference_$(Cluster)_$(Process).log
 error = logs/inference_$(Cluster)_$(Process).err
 output = logs/inference_$(Cluster)_$(Process).out
 
 executable = /venv/bin/sleap-nn
-arguments = track --data_path val.pkg.slp --model_paths models/fly_single_instance/ -o predictions.slp
+arguments = track -i $(video) --model_paths models/fly_single_instance/ -o $(video).predictions.slp
 
 transfer_executable = False
-transfer_input_files = config.yaml, val.pkg.slp, models
+transfer_input_files = config.yaml, models, osdf:///ospool/ap40/data/mats.rynge/fly32/$(video)
 
 request_gpus = 1
 request_cpus = 1
-request_memory = 4GB
+request_memory = 10GB
 request_disk = 15GB
 
 gpus_minimum_capability = 8.0
 
-queue 1
-
+queue video from videos.csv
