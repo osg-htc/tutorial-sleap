@@ -1,3 +1,9 @@
+
+---
+ospool:
+    path: software_examples/ai/tutorial-sleap/README.md
+---
+
 # SLEAP on the OSPool
 
 [SLEAP](https://sleap.ai/) (Social LEAP Estimates Animal Poses) is an open-source deep learning framework for multi-animal pose estimation. This tutorial demonstrates how to train a SLEAP model and run inference on the [OSPool](https://osg-htc.org/services/open_science_pool.html) - a national-scale distributed computing resource - using the [sleap-nn](https://nn.sleap.ai/) backend.
